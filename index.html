@@ -2,172 +2,185 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>Hero Playlist</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>HERO PLAYLIST</title>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Kanit:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--red:#ed1d24;--gold:#f6c343;--ink:#0d0d12;--panel:#1a1a24;--paper:#f4efe4;--blue:#1b3a8a}
+body{--a:#e23636;--b:#f0b429}
+body[data-t=cap]{--a:#1e5bd8;--b:#e8e8f0}
+body[data-t=hulk]{--a:#3fae2a;--b:#b57cf0}
+body[data-t=bp]{--a:#7b3fe4;--b:#c9c9d6}
 *{box-sizing:border-box;margin:0}
-body{font-family:'Kanit',system-ui,sans-serif;color:var(--paper);background:var(--ink);
- background-image:radial-gradient(rgba(237,29,36,.28) 1.5px,transparent 1.6px);background-size:14px 14px;
- min-height:100%;padding:calc(env(safe-area-inset-top,0px) + 12px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);display:flex;justify-content:center}
-main{width:100%;max-width:560px}
-h1{font-family:'Bangers','Impact',sans-serif;font-size:clamp(44px,13vw,72px);letter-spacing:2px;line-height:.95;color:var(--gold);text-shadow:4px 4px 0 var(--red),7px 7px 0 #000;transform:rotate(-2deg);margin:6px 0 6px}
-.tag{font-size:14px;opacity:.75;margin-bottom:18px}
-.panel{background:var(--panel);border:3px solid #000;box-shadow:6px 6px 0 var(--red);padding:14px;margin-bottom:18px}
+body{min-height:100vh;display:flex;justify-content:center;color:#fff;font-family:Kanit,system-ui,sans-serif;
+ padding:calc(env(safe-area-inset-top,0px) + 16px) 16px calc(env(safe-area-inset-bottom,0px) + 24px);
+ background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.09) 1.5px,transparent 0) 0 0/14px 14px,
+ linear-gradient(160deg,#151526,#0a0a12 55%,color-mix(in srgb,var(--a) 40%,#000))}
+.wrap{width:100%;max-width:460px;display:flex;flex-direction:column;gap:16px}
+h1{font-family:Bangers,Impact,sans-serif;font-size:clamp(40px,12vw,58px);letter-spacing:2px;font-weight:400;text-align:center;
+ transform:skew(-6deg) rotate(-2deg);color:var(--b);-webkit-text-stroke:2px #000;paint-order:stroke fill;
+ text-shadow:4px 4px 0 var(--a),7px 7px 0 #000;line-height:1}
+.card{background:#14141f;border:4px solid #000;box-shadow:6px 6px 0 var(--a);padding:14px}
 .row{display:flex;gap:8px}
-input[type=text]{flex:1;min-width:0;padding:12px;border:3px solid #000;background:var(--paper);color:#000;font:inherit;font-size:16px}
-button{font-family:'Bangers','Impact',sans-serif;letter-spacing:1.5px;font-size:20px;cursor:pointer;border:3px solid #000;background:var(--red);color:#fff;padding:10px 16px;box-shadow:3px 3px 0 #000}
-button:active{transform:translate(3px,3px);box-shadow:none}
-button:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-button.alt{background:var(--blue)}button.on{background:var(--gold);color:#000}
-#stage{position:relative;aspect-ratio:16/9;background:#000;border:3px solid #000;box-shadow:6px 6px 0 var(--gold);margin-bottom:18px}
-#stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-#idle{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:16px;font-family:'Bangers';font-size:26px;color:var(--gold);pointer-events:none}
-.now{font-size:17px;font-weight:600;min-height:26px}
-.ctl{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
-.ctl button{padding:10px 0;font-size:22px}
-.opts{margin-top:14px}.opts button{font-size:16px;padding:8px 12px}
-.note{font-size:13px;line-height:1.55;opacity:.8}.note b{color:var(--gold)}
-#msg{color:var(--gold);font-size:14px;min-height:20px;margin-top:8px}
+input{flex:1;min-width:0;padding:12px;font:inherit;font-size:16px;color:#fff;background:#0a0a12;border:3px solid var(--b);outline:none}
+input:focus-visible,button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+button{font-family:Bangers,Impact,sans-serif;letter-spacing:1px;font-size:22px;color:#fff;background:var(--a);
+ border:3px solid #000;box-shadow:3px 3px 0 #000;padding:8px 16px;cursor:pointer;touch-action:manipulation}
+button:active{transform:translate(3px,3px);box-shadow:0 0 0 #000}
+#go{background:var(--b);color:#000}
+.video{aspect-ratio:16/9;background:#000;border:4px solid var(--b);position:relative}
+.video iframe,.video #yt{position:absolute;inset:0;width:100%;height:100%}
+.info{text-align:center;padding:14px 10px}
+#title{font-weight:600;font-size:18px;line-height:1.3;overflow-wrap:anywhere}
+#author{color:#b9b9cc;font-size:14px;margin-top:2px}
+#count{display:inline-block;margin-top:10px;padding:4px 12px;background:var(--a);border:3px solid #000;transform:skew(-8deg);font-size:14px}
+.ctl{display:flex;justify-content:space-between;gap:8px}
+.ctl button{flex:1;font-size:26px;padding:10px 0}
+#shuf{background:#2a2a3c;opacity:.6}
+#shuf.on{background:var(--b);color:#000;opacity:1}
+.themes{display:flex;justify-content:center;gap:12px}
+.themes button{width:34px;height:34px;padding:0;border-radius:50%;box-shadow:2px 2px 0 #000}
+#msg{min-height:20px;text-align:center;font-size:13px;color:#ffd7a0}
 </style>
 </head>
-<body>
-<main>
- <h1>Hero<br>Playlist</h1>
- <p class="tag">วางลิงก์เพลย์ลิสต์ YouTube แล้วกดเล่น</p>
- <section class="panel">
-  <div class="row">
-   <input id="url" type="text" inputmode="url" placeholder="https://www.youtube.com/playlist?list=..." aria-label="ลิงก์เพลย์ลิสต์">
-   <button id="load">เล่น!</button>
-  </div>
-  <div id="msg" role="status"></div>
- </section>
- <div id="stage"><div id="idle">ยังไม่มีเพลย์ลิสต์<br>วางลิงก์ด้านบน</div></div>
- <section class="panel">
-  <div class="now" id="title">—</div>
-  <div id="cnt" style="font-size:13px;opacity:.7;margin-top:2px"></div>
-  <div class="ctl">
-   <button id="shuf" class="alt on" aria-label="สุ่มเพลง">🔀</button>
-   <button id="prev" aria-label="ก่อนหน้า">⏮</button>
-   <button id="play" aria-label="เล่น/หยุด">▶</button>
-   <button id="next" aria-label="ถัดไป">⏭</button>
-   <button id="loop" class="alt on" aria-label="วนซ้ำ">🔁</button>
-  </div>
-  <div class="opts"><button id="auto" class="on">Auto-Resume: เปิด</button></div>
- </section>
- <section class="panel note">
-  <b>เรื่องโฆษณา:</b> ใช้เพลเยอร์ฝังทางการของ YouTube จึงไม่ตัดโฆษณา ถ้าล็อกอิน YouTube Premium ในเบราว์เซอร์เดียวกัน จะไม่มีโฆษณาและเล่นตอนปิดจอได้เสถียรกว่า
- </section>
+<body data-t="iron">
+<main class="wrap">
+ <h1>HERO PLAYLIST</h1>
+ <div class="card row">
+  <input id="url" type="url" inputmode="url" placeholder="วางลิงก์ Playlist ของ YouTube" aria-label="ลิงก์ Playlist">
+  <button id="go">เล่น!</button>
+ </div>
+ <div class="video"><div id="yt"></div></div>
+ <div class="card info">
+  <div id="title">ยังไม่ได้เลือกเพลง</div>
+  <div id="author">วางลิงก์ Playlist แล้วกด "เล่น!"</div>
+  <span id="count">ทั้งหมด 0 เพลง · สุ่มแล้ว 0/0 ในรอบนี้</span>
+ </div>
+ <div class="ctl">
+  <button id="shuf" class="on" title="สุ่ม">🔀</button>
+  <button id="prev" title="ก่อนหน้า">⏮</button>
+  <button id="pp" title="เล่น/หยุด">⏯</button>
+  <button id="next" title="ถัดไป">⏭</button>
+ </div>
+ <div id="msg"></div>
+ <div class="themes">
+  <button data-t="iron" style="background:#e23636" aria-label="ธีม Iron Man"></button>
+  <button data-t="cap" style="background:#1e5bd8" aria-label="ธีม Captain America"></button>
+  <button data-t="hulk" style="background:#3fae2a" aria-label="ธีม Hulk"></button>
+  <button data-t="bp" style="background:#7b3fe4" aria-label="ธีม Black Panther"></button>
+ </div>
 </main>
+
 <script>
 const $=id=>document.getElementById(id);
-let frame=null,userPaused=false,autoResume=true,shuffle=true,loop=true,state=-1,keep=null,listenTimer=null,list=[],bag=[],hist=[],cur=-1,lastJump=0,first=true;
+let player,apiReady=false,loading=false,ids=[],order=[],pos=-1,cur=-1,hist=[],shuffle=true,userPaused=false,silent;
 
-function playlistId(s){
-  s=(s||'').trim();
-  try{const l=new URL(s).searchParams.get('list');if(l)return l}catch(e){}
-  return /^(PL|UU|LL|FL|OL|RD)[\w-]{10,}$/.test(s)?s:null;
-}
-const msg=t=>$('msg').textContent=t;
-const cmd=(f,a=[])=>{if(frame&&frame.contentWindow)frame.contentWindow.postMessage(JSON.stringify({event:'command',func:f,args:a}),'https://www.youtube.com')};
-const listen=()=>{if(frame&&frame.contentWindow)frame.contentWindow.postMessage(JSON.stringify({event:'listening',id:1,channel:'widget'}),'https://www.youtube.com')};
+/* ---------- YouTube API ---------- */
+const tag=document.createElement('script');tag.src='https://www.youtube.com/iframe_api';document.head.appendChild(tag);
+window.onYouTubeIframeAPIReady=()=>{apiReady=true};
 
-function makeSilence(){
-  const n=8000,b=new ArrayBuffer(44+n),v=new DataView(b);
-  const w=(o,s)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));
-  w(0,'RIFF');v.setUint32(4,36+n,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
-  v.setUint32(24,8000,true);v.setUint32(28,8000,true);v.setUint16(32,1,true);v.setUint16(34,8,true);
-  w(36,'data');v.setUint32(40,n,true);new Uint8Array(b,44).fill(128);
-  const a=new Audio(URL.createObjectURL(new Blob([b],{type:'audio/wav'})));a.loop=true;a.volume=.01;return a;
+/* ---------- Silent audio (ช่วยให้ iOS ถือว่าเป็นแอปเล่นเสียง) ---------- */
+function silentWav(){
+ const sr=8000,n=sr,b=new Uint8Array(44+n),v=new DataView(b.buffer),s=(o,t)=>[...t].forEach((c,i)=>b[o+i]=c.charCodeAt(0));
+ s(0,'RIFF');v.setUint32(4,36+n,true);s(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+ v.setUint32(24,sr,true);v.setUint32(28,sr,true);v.setUint16(32,1,true);v.setUint16(34,8,true);s(36,'data');v.setUint32(40,n,true);
+ b.fill(128,44);return URL.createObjectURL(new Blob([b],{type:'audio/wav'}));
 }
 
-function start(id){
-  $('idle').style.display='none';
-  if(frame)frame.remove();
-  list=[];bag=[];hist=[];cur=-1;first=true;updCnt();
-  frame=document.createElement('iframe');
-  frame.allow='autoplay; encrypted-media; picture-in-picture';
-  frame.setAttribute('allowfullscreen','');
-  frame.src='https://www.youtube.com/embed/videoseries?list='+encodeURIComponent(id)+'&enablejsapi=1&playsinline=1&autoplay=1&rel=0&origin='+encodeURIComponent(location.origin);
-  frame.onload=()=>{listen();clearInterval(listenTimer);let n=0;listenTimer=setInterval(()=>{listen();cmd('setShuffle',[false]);cmd('setLoop',[loop]);if(++n>4)clearInterval(listenTimer)},700)};
-  $('stage').appendChild(frame);
+/* ---------- Shuffle logic ---------- */
+function newRound(avoid){
+ order=[...Array(ids.length).keys()];
+ for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
+ if(order.length>1&&order[0]===avoid){const j=1+Math.floor(Math.random()*(order.length-1));[order[0],order[j]]=[order[j],order[0]]}
+ pos=-1;
+}
+function next(){
+ if(!ids.length)return;
+ if(shuffle){pos++;if(pos>=order.length){newRound(cur);pos=0}playIdx(order[pos])}
+ else playIdx((cur+1)%ids.length);
+}
+function prev(){
+ if(!ids.length)return;
+ if(hist.length>1){hist.pop();playIdx(hist[hist.length-1],false)}else player.seekTo(0,true);
+}
+function playIdx(i,rec=true){
+ cur=i;if(rec)hist.push(i);userPaused=false;
+ player.loadVideoById(ids[i]);updateCount();
+}
+function updateCount(){
+ const n=ids.length;
+ $('count').textContent=shuffle?`ทั้งหมด ${n} เพลง · สุ่มแล้ว ${Math.max(pos+1,0)}/${n} ในรอบนี้`:`ทั้งหมด ${n} เพลง · เล่นตามลำดับ ${cur+1}/${n}`;
 }
 
-function updCnt(){
-  $('cnt').textContent=list.length?('ทั้งหมด '+list.length+' เพลง · สุ่มแล้วรอบนี้ '+(list.length-bag.length)+' เพลง'):'';
-}
-/* สุ่มแบบไม่ซ้ำจนกว่าจะครบทุกเพลง แล้วเริ่มรอบใหม่ */
-function pickRandom(){
-  if(!list.length)return -1;
-  if(!bag.length){
-    bag=list.map((_,i)=>i);
-    for(let i=bag.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[bag[i],bag[j]]=[bag[j],bag[i]]}
-    if(bag.length>1&&bag[bag.length-1]===cur)bag.unshift(bag.pop());
-  }
-  return bag.pop();
-}
-function jumpNext(force){
-  if(!force&&Date.now()-lastJump<1500)return;
-  const i=pickRandom();
-  if(i<0){cmd('nextVideo');return}
-  lastJump=Date.now();
-  if(cur>=0){hist.push(cur);if(hist.length>50)hist.shift()}
-  cmd('playVideoAt',[i]);
-  updCnt();
-}
-function onState(s){
-  state=s;
-  if(s===0&&shuffle)jumpNext();
-  $('play').textContent=s===1?'⏸':'▶';
-  if(s===1)userPaused=false;
-  if(s===2&&autoResume&&!userPaused&&!document.hidden)setTimeout(()=>{if(state===2&&!userPaused)cmd('playVideo')},1200);
-}
-function setMeta(t,a){
-  if(!t)return;$('title').textContent=t;document.title=t+' · Hero Playlist';
-  if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:t,artist:a||'',album:'Hero Playlist'});
-}
-window.addEventListener('message',e=>{
-  if(e.origin!=='https://www.youtube.com')return;
-  let d;try{d=JSON.parse(e.data)}catch(x){return}
-  if(d.event==='onStateChange')onState(d.info);
-  if(d.event==='infoDelivery'&&d.info){
-    if(Array.isArray(d.info.playlist)&&d.info.playlist.length&&d.info.playlist.length!==list.length){
-      list=d.info.playlist;bag=[];
-      if(first){first=false;if(shuffle){const i=pickRandom();if(i>=0&&i!==cur){lastJump=Date.now();cmd('playVideoAt',[i])}}}
-      updCnt();
-    }
-    if(typeof d.info.playlistIndex==='number')cur=d.info.playlistIndex;
-    if('playerState' in d.info)onState(d.info.playerState);
-    if(d.info.videoData)setMeta(d.info.videoData.title,d.info.videoData.author);
-  }
-});
-function setMedia(){
-  if(!('mediaSession' in navigator))return;
-  const m=navigator.mediaSession;
-  m.setActionHandler('play',()=>{userPaused=false;cmd('playVideo')});
-  m.setActionHandler('pause',()=>{userPaused=true;cmd('pauseVideo')});
-  m.setActionHandler('previoustrack',()=>$('prev').click());
-  m.setActionHandler('nexttrack',()=>$('next').click());
+/* ---------- Player ---------- */
+function parseId(t){const m=t.match(/[?&]list=([\w-]+)/);return m?m[1]:(/^[\w-]{10,}$/.test(t.trim())?t.trim():null)}
+function msg(t){$('msg').textContent=t||''}
+
+async function go(){
+ const id=parseId($('url').value);
+ if(!id){msg('ลิงก์ไม่ถูกต้อง ต้องมี list=... ในลิงก์');return}
+ try{localStorage.setItem('hp-url',$('url').value)}catch(e){}
+ if(!silent){silent=new Audio(silentWav());silent.loop=true}
+ silent.play().catch(()=>{});
+ let w=0;while(!apiReady&&w++<50)await new Promise(r=>setTimeout(r,100));
+ if(!apiReady){msg('โหลด YouTube API ไม่สำเร็จ ตรวจสอบอินเทอร์เน็ต');return}
+ loading=true;ids=[];hist=[];cur=-1;pos=-1;msg('กำลังโหลด Playlist...');
+ if(player)player.cuePlaylist({list:id,listType:'playlist'});
+ else player=new YT.Player('yt',{playerVars:{listType:'playlist',list:id,playsinline:1,rel:0,modestbranding:1},
+  events:{onStateChange,onError:()=>setTimeout(next,800)}});
 }
 
-$('load').onclick=()=>{
-  const id=playlistId($('url').value);
-  if(!id){msg('ไม่พบรหัสเพลย์ลิสต์ในลิงก์ (ต้องมี list=...)');return}
-  msg('');try{localStorage.setItem('hp_url',$('url').value)}catch(e){}
-  if(!keep)keep=makeSilence();keep.play().catch(()=>{});
-  setMedia();start(id);
+function fetchIds(tries=0){
+ const l=player.getPlaylist();
+ if(l&&l.length){
+  ids=l;loading=false;msg('');
+  if(shuffle)newRound(-1);
+  next();
+  setTimeout(()=>{if(player.getPlayerState()!==1)msg('แตะปุ่ม ⏯ หรือหน้าจอวิดีโอ 1 ครั้งเพื่อเริ่มเล่น')},2500);
+ }else if(tries<8)setTimeout(()=>fetchIds(tries+1),600);
+ else{loading=false;msg('อ่าน Playlist ไม่ได้ (ต้องเป็น Playlist สาธารณะ/ไม่ใช่ Mix) และไฟล์ต้องเปิดผ่าน https://')}
+}
+
+function onStateChange(e){
+ const s=e.data;
+ if(s===5&&loading)fetchIds();
+ else if(s===0)next();
+ else if(s===1){msg('');meta();setPS('playing');silent&&silent.paused&&silent.play().catch(()=>{})}
+ else if(s===2){setPS('paused');
+  if(!userPaused&&!loading&&document.hidden)setTimeout(()=>{if(!userPaused&&player.getPlayerState()===2)player.playVideo()},600)}
+}
+function setPS(s){if('mediaSession' in navigator)navigator.mediaSession.playbackState=s}
+function meta(){
+ const d=player.getVideoData();
+ $('title').textContent=d.title||'…';$('author').textContent=d.author||'';
+ if('mediaSession' in navigator&&d.video_id)navigator.mediaSession.metadata=new MediaMetadata({
+  title:d.title||'',artist:d.author||'',album:'HERO PLAYLIST',
+  artwork:[{src:`https://i.ytimg.com/vi/${d.video_id}/hqdefault.jpg`,sizes:'480x360',type:'image/jpeg'}]});
+}
+function toggle(){
+ if(!player)return;
+ if(player.getPlayerState()===1){userPaused=true;player.pauseVideo()}else{userPaused=false;player.playVideo()}
+}
+
+/* ---------- Controls & lock-screen ---------- */
+$('go').onclick=go;
+$('url').addEventListener('keydown',e=>{if(e.key==='Enter')go()});
+$('next').onclick=next;$('prev').onclick=prev;$('pp').onclick=toggle;
+$('shuf').onclick=()=>{
+ shuffle=!shuffle;$('shuf').classList.toggle('on',shuffle);
+ if(shuffle&&ids.length){newRound(-1);if(cur>=0){const k=order.indexOf(cur);[order[0],order[k]]=[order[k],order[0]];pos=0}}
+ if(ids.length)updateCount();
 };
-$('url').addEventListener('keydown',e=>{if(e.key==='Enter')$('load').click()});
-$('play').onclick=()=>{if(state===1){userPaused=true;cmd('pauseVideo')}else{userPaused=false;cmd('playVideo')}};
-$('next').onclick=()=>shuffle?jumpNext(true):cmd('nextVideo');
-$('prev').onclick=()=>{if(shuffle&&hist.length){lastJump=Date.now();cmd('playVideoAt',[hist.pop()])}else cmd('previousVideo')};
-$('shuf').onclick=e=>{shuffle=!shuffle;e.currentTarget.classList.toggle('on',shuffle)};
-$('loop').onclick=e=>{loop=!loop;e.currentTarget.classList.toggle('on',loop);cmd('setLoop',[loop])};
-$('auto').onclick=e=>{autoResume=!autoResume;e.currentTarget.classList.toggle('on',autoResume);e.currentTarget.textContent='Auto-Resume: '+(autoResume?'เปิด':'ปิด')};
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&autoResume&&!userPaused&&state===2)cmd('playVideo')});
-try{const u=localStorage.getItem('hp_url');if(u)$('url').value=u}catch(e){}
+document.querySelectorAll('.themes button').forEach(b=>b.onclick=()=>document.body.dataset.t=b.dataset.t);
+if('mediaSession' in navigator){
+ const h=(a,f)=>{try{navigator.mediaSession.setActionHandler(a,f)}catch(e){}};
+ h('play',()=>{userPaused=false;player&&player.playVideo()});
+ h('pause',()=>{userPaused=true;player&&player.pauseVideo()});
+ h('nexttrack',next);h('previoustrack',prev);
+}
+document.addEventListener('visibilitychange',()=>{
+ if(!document.hidden&&player&&ids.length&&!userPaused&&player.getPlayerState()===2)player.playVideo();
+});
+try{$('url').value=localStorage.getItem('hp-url')||''}catch(e){}
 </script>
 </body>
 </html>

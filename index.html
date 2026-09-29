@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YouTube Playlist Random Player</title>
+<style>
+  :root {
+    --bg: #0b0d10;
+    --panel: #15191f;
+    --panel2: #1d232b;
+    --text: #f4f6f8;
+    --muted: #9da7b3;
+    --accent: #ff0033;
+    --border: #2b333d;
+    --good: #39d98a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(circle at top, #18202a 0, var(--bg) 45%);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+  }
+  .wrap {
+    width: min(1050px, calc(100% - 28px));
+    margin: 28px auto;
+  }
+  h1 { margin: 0 0 7px; font-size: 28px; }
+  .sub { color: var(--muted); margin-bottom: 22px; }
+  .panel {
+    background: rgba(21,25,31,.96);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.25);
+  }
+  .inputrow {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+  }
+  input {
+    width: 100%;
+    background: #0e1115;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    font-size: 15px;
+    outline: none;
+  }
+  input:focus { border-color: #566270; }
+  button {
+    border: 0;
+    border-radius: 10px;
+    padding: 11px 17px;
+    color: white;
+    background: var(--panel2);
+    cursor: pointer;
+    font-weight: 700;
+  }
+  button:hover { filter: brightness(1.15); }
+  button.primary { background: var(--accent); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  #player {
+    width: 100%;
+    aspect-ratio: 16/9;
+    margin-top: 18px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+  }
+  #player iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 13px;
+  }
+  .status {
+    margin-top: 14px;
+    padding: 13px 14px;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: #101419;
+    line-height: 1.55;
+  }
+  .status strong { color: var(--good); }
+  .meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .stat {
+    background: #101419;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 12px;
+  }
+  .stat .label { color: var(--muted); font-size: 12px; }
+  .stat .value { font-size: 19px; font-weight: 800; margin-top: 4px; }
+  .queue {
+    margin-top: 18px;
+    max-height: 310px;
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+  }
+  .item {
+    display: grid;
+    grid-template-columns: 42px 1fr 75px;
+    gap: 8px;
+    padding: 9px 11px;
+    border-bottom: 1px solid #252c34;
+    align-items: center;
+    font-size: 13px;
+  }
+  .item:last-child { border-bottom: 0; }
+  .item.now { background: rgba(255,0,51,.12); }
+  .num { color: var(--muted); }
+  .title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .badge {
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  .error {
+    color: #ff7c8f;
+    margin-top: 10px;
+    min-height: 20px;
+  }
+  .hint {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  @media (max-width: 700px) {
+    .inputrow { grid-template-columns: 1fr; }
+    .meta { grid-template-columns: 1fr; }
+    .item { grid-template-columns: 35px 1fr 65px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎵 YouTube Playlist Random Player</h1>
+  <div class="sub">สุ่มเพลงจาก Playlist โดยไม่ซ้ำจนกว่าจะเล่นครบทั้ง Playlist</div>
+
+  <div class="panel">
+    <div class="inputrow">
+      <input id="playlistUrl" type="text"
+             placeholder="วางลิงก์ YouTube Playlist เช่น https://www.youtube.com/playlist?list=...">
+      <button id="loadBtn" class="primary">โหลด Playlist</button>
+    </div>
+
+    <div id="error" class="error"></div>
+
+    <div id="player"></div>
+
+    <div class="controls">
+      <button id="prevBtn" disabled>⏮ ก่อนหน้า</button>
+      <button id="playBtn" disabled>▶ เล่น</button>
+      <button id="pauseBtn" disabled>⏸ หยุด</button>
+      <button id="nextBtn" disabled>⏭ เพลงถัดไป</button>
+      <button id="reshuffleBtn" disabled>🔀 สุ่มรอบใหม่</button>
+    </div>
+
+    <div class="status" id="status">
+      <strong>พร้อมใช้งาน</strong><br>
+      ใส่ลิงก์ Playlist แล้วกด “โหลด Playlist”
+    </div>
+
+    <div class="meta">
+      <div class="stat">
+        <div class="label">เพลงทั้งหมด</div>
+        <div class="value" id="total">—</div>
+      </div>
+      <div class="stat">
+        <div class="label">เล่นแล้วในรอบนี้</div>
+        <div class="value" id="played">—</div>
+      </div>
+      <div class="stat">
+        <div class="label">เหลือในรอบนี้</div>
+        <div class="value" id="remaining">—</div>
+      </div>
+    </div>
+
+    <div class="queue" id="queue"></div>
+
+    <div class="hint">
+      หมายเหตุ: การเล่นอัตโนมัติของ browser อาจถูกบล็อกจนกว่าคุณจะกดปุ่มเล่นครั้งแรก
+      และความต่อเนื่องของการ stream ยังขึ้นกับ YouTube/เครือข่าย จึงไม่สามารถรับประกันการกระตุกเป็นศูนย์ 100% ได้
+    </div>
+  </div>
+</div>
+
+<script>
+let player = null;
+let playlistId = null;
+
+let allVideos = [];       // [{id,title}]
+let queue = [];            // shuffled video objects
+let history = [];          // เล่นแล้วในรอบนี้
+let currentIndex = -1;
+let ready = false;
+let loading = false;
+let apiReady = false;
+
+const $ = id => document.getElementById(id);
+
+function setError(msg) {
+  $("error").textContent = msg || "";
+}
+
+function setStatus(main, sub="") {
+  $("status").innerHTML = "<strong>" + escapeHtml(main) + "</strong>" +
+    (sub ? "<br>" + escapeHtml(sub) : "");
+}
+
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+  }[c]));
+}
+
+function extractPlaylistId(url) {
+  try {
+    const u = new URL(url.trim());
+    if (u.hostname.includes("youtube.com") && u.searchParams.get("list"))
+      return u.searchParams.get("list");
+    if (u.hostname === "youtu.be" && u.searchParams.get("list"))
+      return u.searchParams.get("list");
+  } catch(e) {}
+  const m = String(url).match(/[?&]list=([A-Za-z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function updateStats() {
+  $("total").textContent = allVideos.length || "—";
+  $("played").textContent = allVideos.length ? history.length : "—";
+  $("remaining").textContent =
+    allVideos.length ? Math.max(0, queue.length - currentIndex - 1) : "—";
+}
+
+function renderQueue() {
+  const box = $("queue");
+  if (!queue.length) {
+    box.innerHTML = "";
+    return;
+  }
+  box.innerHTML = queue.map((v, i) => {
+    const isNow = i === currentIndex;
+    return `<div class="item ${isNow ? "now" : ""}">
+      <div class="num">${i + 1}</div>
+      <div class="title">${escapeHtml(v.title || v.id)}</div>
+      <div class="badge">${isNow ? "NOW PLAYING" : (i < currentIndex ? "PLAYED" : "QUEUE")}</div>
+    </div>`;
+  }).join("");
+  const now = box.querySelector(".now");
+  if (now) now.scrollIntoView({block:"nearest"});
+}
+
+function enableControls(on) {
+  ["playBtn","pauseBtn","nextBtn","prevBtn","reshuffleBtn"]
+    .forEach(id => $(id).disabled = !on);
+}
+
+function buildNewRound() {
+  if (!allVideos.length) return;
+  queue = shuffle(allVideos);
+
+  // Avoid the first song of a new round being the same as the final song
+  // of the previous round when there is more than one song.
+  if (allVideos.length > 1 && history.length) {
+    const lastId = history[history.length - 1].id;
+    if (queue[0].id === lastId) {
+      const swapIndex = queue.findIndex(v => v.id !== lastId);
+      if (swapIndex > 0) [queue[0], queue[swapIndex]] = [queue[swapIndex], queue[0]];
+    }
+  }
+
+  history = [];
+  currentIndex = -1;
+  updateStats();
+  renderQueue();
+}
+
+function playAt(index, autoplay=true) {
+  if (!player || !queue.length) return;
+  if (index < 0) index = 0;
+
+  // New round
+  if (index >= queue.length) {
+    buildNewRound();
+    index = 0;
+    setStatus("เริ่มรอบใหม่", "เล่นครบทุกเพลงแล้ว ระบบสร้างลำดับสุ่มใหม่");
+  }
+
+  currentIndex = index;
+  const v = queue[currentIndex];
+
+  if (!history.some(x => x.id === v.id)) history.push(v);
+
+  updateStats();
+  renderQueue();
+
+  // cue first, then play when requested. loadVideoById generally starts
+  // quickly and avoids loading the whole YouTube playlist as the active queue.
+  if (autoplay) {
+    player.loadVideoById(v.id);
+  } else {
+    player.cueVideoById(v.id);
+  }
+
+  setStatus("กำลังเล่น", v.title || v.id);
+  saveState();
+}
+
+function nextSong() {
+  if (!queue.length) return;
+  if (currentIndex + 1 >= queue.length) {
+    buildNewRound();
+    playAt(0, true);
+  } else {
+    playAt(currentIndex + 1, true);
+  }
+}
+
+function prevSong() {
+  if (!queue.length) return;
+  const target = Math.max(0, currentIndex - 1);
+  playAt(target, true);
+}
+
+function reshuffle() {
+  if (!allVideos.length) return;
+  buildNewRound();
+  playAt(0, true);
+}
+
+function saveState() {
+  try {
+    localStorage.setItem("ytRandomPlayerState", JSON.stringify({
+      playlistId,
+      allVideos,
+      queue,
+      history,
+      currentIndex
+    }));
+  } catch(e) {}
+}
+
+function restoreState() {
+  try {
+    const s = JSON.parse(localStorage.getItem("ytRandomPlayerState") || "null");
+    if (!s || !s.playlistId || !Array.isArray(s.allVideos) || !s.allVideos.length) return false;
+    playlistId = s.playlistId;
+    allVideos = s.allVideos;
+    queue = Array.isArray(s.queue) && s.queue.length ? s.queue : shuffle(allVideos);
+    history = Array.isArray(s.history) ? s.history : [];
+    currentIndex = Number.isInteger(s.currentIndex) ? s.currentIndex : -1;
+
+    $("playlistUrl").value = "https://www.youtube.com/playlist?list=" + playlistId;
+    updateStats();
+    renderQueue();
+    enableControls(true);
+    setStatus("กู้คืน Playlist เดิม", "กดเล่นเพื่อเริ่มจากสถานะที่บันทึกไว้");
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+/*
+ * We load the YouTube playlist into the IFrame player only to let YouTube
+ * expose its playlist metadata. The actual playback order is controlled
+ * by our own queue, so YouTube's native shuffle is NOT used.
+ */
+function loadPlaylist() {
+  if (!apiReady) {
+    setError("YouTube Player API ยังไม่พร้อม กรุณารอสักครู่แล้วลองอีกครั้ง");
+    return;
+  }
+
+  const url = $("playlistUrl").value.trim();
+  const id = extractPlaylistId(url);
+
+  if (!id) {
+    setError("ไม่พบ Playlist ID ในลิงก์ กรุณาใช้ลิงก์ YouTube Playlist ที่มี ?list=...");
+    return;
+  }
+
+  setError("");
+  playlistId = id;
+  loading = true;
+  ready = false;
+  setStatus("กำลังโหลด Playlist…", "กำลังอ่านรายชื่อเพลงจาก YouTube");
+  enableControls(false);
+
+  /*
+   * Destroy/recreate player so a previous playlist cannot leak into the new one.
+   */
+  if (player && player.destroy) {
+    try { player.destroy(); } catch(e) {}
+  }
+
+  const holder = document.createElement("div");
+  holder.id = "yt-player";
+  $("player").innerHTML = "";
+  $("player").appendChild(holder);
+
+  player = new YT.Player("yt-player", {
+    width: "100%",
+    height: "100%",
+    playerVars: {
+      playsinline: 1,
+      controls: 1,
+      rel: 0,
+      modestbranding: 1,
+      iv_load_policy: 3
+    },
+    events: {
+      onReady: onPlayerReady,
+      onStateChange: onPlayerStateChange,
+      onError: onPlayerError
+    }
+  });
+}
+
+function onPlayerReady() {
+  /*
+   * loadPlaylist makes YouTube load its playlist and makes getPlaylist()
+   * available. We do not use YouTube's order for playback.
+   */
+  player.loadPlaylist({
+    listType: "playlist",
+    list: playlistId,
+    index: 0,
+    startSeconds: 0
+  });
+
+  // Give YouTube a short moment to populate the playlist.
+  waitForPlaylistItems(0);
+}
+
+function waitForPlaylistItems(attempt) {
+  if (!player) return;
+  const ids = player.getPlaylist ? player.getPlaylist() : null;
+
+  if (Array.isArray(ids) && ids.length) {
+    /*
+     * Titles are not always exposed by getPlaylist(), so we store IDs.
+     * YouTube itself supplies the title through getVideoData when a video
+     * is cued/played. This keeps the app API-key-free.
+     */
+    allVideos = ids.map(id => ({id, title: id}));
+    buildNewRound();
+    loading = false;
+    ready = true;
+    enableControls(true);
+
+    setStatus(
+      "Playlist พร้อมแล้ว",
+      `${allVideos.length} เพลง — กด ▶ เล่น เพื่อเริ่ม`
+    );
+
+    // Cue the first random song without autoplay.
+    playAt(0, false);
+    saveState();
+    return;
+  }
+
+  if (attempt < 30) {
+    setTimeout(() => waitForPlaylistItems(attempt + 1), 300);
+  } else {
+    loading = false;
+    setError(
+      "ไม่สามารถอ่านรายการเพลงจาก Playlist ได้ อาจเป็น Playlist ส่วนตัว/ถูกจำกัด " +
+      "หรือ YouTube ยังไม่ส่งข้อมูลให้ Player"
+    );
+    setStatus("โหลด Playlist ไม่สำเร็จ");
+  }
+}
+
+function onPlayerStateChange(event) {
+  if (!player) return;
+
+  if (event.data === YT.PlayerState.ENDED) {
+    // The only automatic transition in the application.
+    // It happens when the current video has genuinely ended.
+    setTimeout(() => {
+      if (player) nextSong();
+    }, 0);
+    return;
+  }
+
+  if (event.data === YT.PlayerState.PLAYING) {
+    const data = player.getVideoData ? player.getVideoData() : null;
+    if (data && data.video_id) {
+      const item = queue[currentIndex];
+      if (item && item.id === data.video_id && data.title) {
+        item.title = data.title;
+        renderQueue();
+      }
+    }
+  }
+}
+
+function onPlayerError(event) {
+  const codes = {
+    2: "Video ID ไม่ถูกต้อง",
+    5: "HTML5 player error",
+    100: "ไม่พบวิดีโอ หรือถูกลบ/เป็น private",
+    101: "เจ้าของวิดีโอไม่อนุญาตให้เล่นแบบฝัง",
+    150: "เจ้าของวิดีโอไม่อนุญาตให้เล่นแบบฝัง"
+  };
+  setError("YouTube ไม่สามารถเล่นเพลงนี้: " + (codes[event.data] || "Unknown error"));
+
+  // Skip unavailable videos automatically so the player can continue.
+  setTimeout(() => {
+    if (player && queue.length) nextSong();
+  }, 250);
+}
+
+/* YouTube API callback */
+window.onYouTubeIframeAPIReady = function() {
+  apiReady = true;
+  setStatus("พร้อมใช้งาน", "ใส่ลิงก์ Playlist แล้วกด “โหลด Playlist”");
+  restoreState();
+};
+
+$("loadBtn").addEventListener("click", loadPlaylist);
+$("playBtn").addEventListener("click", () => {
+  if (player) player.playVideo();
+});
+$("pauseBtn").addEventListener("click", () => {
+  if (player) player.pauseVideo();
+});
+$("nextBtn").addEventListener("click", nextSong);
+$("prevBtn").addEventListener("click", prevSong);
+$("reshuffleBtn").addEventListener("click", reshuffle);
+
+$("playlistUrl").addEventListener("keydown", e => {
+  if (e.key === "Enter") loadPlaylist();
+});
+
+/*
+ * YouTube's official IFrame Player API.
+ */
+const script = document.createElement("script");
+script.src = "https://www.youtube.com/iframe_api";
+document.head.appendChild(script);
+</script>
+</body>
+</html>

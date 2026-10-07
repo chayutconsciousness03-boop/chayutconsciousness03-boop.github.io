@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#07111f" />
+    <title>Hero Random Player</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="brand"><span class="brand-mark">✦</span><span>HERO</span><small>RANDOM PLAYER</small><span class="status-dot" id="connectionDot"></span><span id="connectionLabel">Online</span></header>
+      <section class="load-card" id="loadCard">
+        <p class="eyebrow">MUSIC SYSTEM / READY</p>
+        <h1>Make every round<br /><em>unexpected.</em></h1>
+        <p class="lead">Load a YouTube playlist, then play every eligible track once in a genuinely shuffled round.</p>
+        <label for="playlistUrl">YouTube Playlist URL</label>
+        <div class="url-row"><input id="playlistUrl" type="url" inputmode="url" autocomplete="url" placeholder="https://www.youtube.com/playlist?list=…" /><button class="primary" id="loadButton">Load playlist</button></div>
+        <p class="message" id="loadMessage" aria-live="polite">Your API key stays on the server — never in this page.</p>
+        <aside class="reality-note"><strong>About iPhone background playback:</strong> this app uses the official YouTube embedded player and Media Session where available. Web pages cannot force iOS/Safari/Brave to keep YouTube playing after a lock screen or app switch; behavior depends on iOS, browser, YouTube, network, and power settings.</aside>
+      </section>
+
+      <section class="player-layout hidden" id="playerScreen">
+        <div class="topline"><button class="text-button" id="changePlaylist">← Change playlist</button><span id="playlistSummary"></span></div>
+        <section class="now-playing panel">
+          <div class="art-wrap" id="artWrap"><img id="art" alt="Current track artwork" /><div id="youtubePlayer" aria-label="Official YouTube player"></div><div class="art-overlay"></div></div>
+          <div class="track-copy"><p class="eyebrow">NOW PLAYING <span id="roundLabel"></span></p><h2 id="title">Ready to begin</h2><p id="channel">Select Start Random Play to begin.</p><p class="micro" id="queuePosition"></p></div>
+          <div class="progress-area"><div class="time-row"><span id="elapsed">0:00</span><span id="duration">0:00</span></div><input id="progress" aria-label="Track progress" type="range" min="0" max="100" value="0" /></div>
+          <div class="controls"><button class="control" id="previous" aria-label="Previous track">↶<small>PREV</small></button><button class="play" id="playPause" aria-label="Start music">▶<small>START MUSIC</small></button><button class="control" id="next" aria-label="Next track">↷<small>NEXT</small></button></div>
+          <p class="playback-message" id="playbackMessage" aria-live="polite"></p>
+        </section>
+        <aside class="sidebar">
+          <section class="panel next-card"><p class="eyebrow">NEXT</p><div id="nextTrack">Queue is being prepared…</div></section>
+          <section class="panel queue-card"><div class="section-heading"><div><p class="eyebrow">QUEUE</p><strong id="queueCount">0 remaining</strong></div><button class="text-button" id="showMore">Show more</button></div><ol id="queueList" class="queue-list"></ol></section>
+          <section class="panel history-card"><p class="eyebrow">RECENTLY PLAYED</p><ol id="historyList" class="queue-list"></ol></section>
+        </aside>
+      </section>
+    </main>
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
